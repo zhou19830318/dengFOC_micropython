@@ -28,7 +28,7 @@ from as5600 import AS5600
 
 // 初始化两个 I2C 总线
 i2c1 = I2C(0, scl=Pin(18), sda=Pin(19), freq=400000)  # 总线 1
-i2c2 = I2C(1, scl=Pin(25), sda=Pin(26), freq=400000)  # 总线 2
+i2c2 = I2C(1, scl=Pin(5), sda=Pin(23), freq=400000)  # 总线 2
 
 // 实例化多个 AS5600 编码器
 encoder1 = AS5600(i2c=i2c1, address=0x36)  # 连接到总线 1
