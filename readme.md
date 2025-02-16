@@ -20,7 +20,7 @@ while True:
     print("Encoder 1 Angle:", encoder1.getAngle())
     print("Encoder 2 Angle:", encoder2.getAngle())
 ```
-## 使用不同的 I2C 总线
+## 2. 使用不同的 I2C 总线
 如果多个 AS5600 编码器的地址相同（无法更改），可以将它们连接到不同的 I2C 总线上，然后分别实例化。
 ```python
 from machine import I2C, Pin
@@ -40,7 +40,7 @@ while True:
     print("Encoder 2 Angle:", encoder2.getAngle())
 ```
 
-## 动态检测 I2C 设备
+## 3. 动态检测 I2C 设备
 ## 如果不知道具体的 I2C 地址，可以通过扫描 I2C 总线动态检测连接的设备，然后实例化对应的编码器。
 
 ```python
