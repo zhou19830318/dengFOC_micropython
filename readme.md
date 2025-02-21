@@ -9,6 +9,6 @@ if __name__ == '__main__':
     
     while True:
         runFOC()
-        DFOC_M0_setVelocity(1)  # 目标速度10rad/s
+        DFOC_M0_setVelocity(10)  # 目标速度10rad/s
         time.sleep_ms(1)
 ```
