@@ -1,5 +1,4 @@
 # 灯哥开源，转载请著名出处
-# 仅在DengFOC上测试过
 import math
 from machine import Pin, PWM
 import time
