@@ -1,1 +1,1 @@
-DengFOC_micropython库是基于灯哥开源的DengFOC库，使用 micropython 重构的开源 FOC 库。
+DengFOC_micropython是基于灯哥开源的DengFOC库，使用 micropython 重构的FOC电机控制代码。
