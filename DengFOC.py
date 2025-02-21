@@ -55,9 +55,6 @@ pwm_channels = {
 S0 = Sensor_AS5600(0)
 S1 = Sensor_AS5600(1)
 
-# I2C初始化
-i2c0 = I2C(0, scl=Pin(19), sda=Pin(18), freq=400000)
-i2c1 = I2C(1, scl=Pin(23), sda=Pin(5), freq=400000)
 
 # 滤波器初始化
 M0_Vel_Flt = LowPassFilter(0.01)
