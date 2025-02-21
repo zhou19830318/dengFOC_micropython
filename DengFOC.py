@@ -54,8 +54,11 @@ pwm_channels = {
 # 传感器初始化
 S0 = Sensor_AS5600(0)
 S1 = Sensor_AS5600(1)
-
-
+'''
+# I2C初始化
+i2c0 = I2C(0, scl=Pin(18), sda=Pin(19), freq=400000)
+i2c1 = I2C(1, scl=Pin(5), sda=Pin(23), freq=400000)
+'''
 # 滤波器初始化
 M0_Vel_Flt = LowPassFilter(0.01)
 M1_Vel_Flt = LowPassFilter(0.01)
@@ -77,6 +80,65 @@ CS_M1 = CurrSense(1)
 # 电机校准参数
 S0_zero_electric_angle = 0.0
 S1_zero_electric_angle = 0.0
+
+#//=================PID 设置函数=================
+#//速度PID
+def DFOC_M0_SET_VEL_PID(P, I, D, ramp, limit):  #//M0角度环PID设置
+    vel_loop_M0.P = P
+    vel_loop_M0.I = I
+    vel_loop_M0.D = D
+    vel_loop_M0.output_ramp = ramp
+    vel_loop_M0.limit = limit
+
+#//角度PID
+def DFOC_M0_SET_ANGLE_PID(P, I, D, ramp, limit):  #//M0角度环PID设置
+    angle_loop_M0.P = P
+    angle_loop_M0.I = I
+    angle_loop_M0.D = D
+    angle_loop_M0.output_ramp = ramp
+    angle_loop_M0.limit = limit
+
+def DFOC_M0_SET_CURRENT_PID(P, I, D, ramp):  #//M0电流环PID设置
+    current_loop_M0.P = P
+    current_loop_M0.I = I
+    current_loop_M0.D = D
+    current_loop_M0.output_ramp = ramp
+
+def DFOC_M1_SET_VEL_PID(P, I, D, ramp, limit):  #//M0角度环PID设置
+    vel_loop_M1.P = P
+    vel_loop_M1.I = I
+    vel_loop_M1.D = D
+    vel_loop_M1.output_ramp = ramp
+    vel_loop_M1.limit = limit
+
+#//角度PID
+def DFOC_M1_SET_ANGLE_PID(P, I, D, ramp, limit):  #//M0角度环PID设置
+    angle_loop_M1.P = P
+    angle_loop_M1.I = I
+    angle_loop_M1.D = D
+    angle_loop_M1.output_ramp = ramp
+    angle_loop_M1.limit = limit
+
+def DFOC_M1_SET_CURRENT_PID(P, I, D, ramp):  #//M0电流环PID设置
+    current_loop_M1.P = P
+    current_loop_M1.I = I
+    current_loop_M1.D = D
+    current_loop_M1.output_ramp = ramp
+
+#//M0速度PID接口
+def DFOC_M0_VEL_PID(error):  #//M0速度环
+    return vel_loop_M0(error)
+
+#//M0角度PID接口
+def DFOC_M0_ANGLE_PID(error):
+    return angle_loop_M0(error)
+
+def DFOC_M1_VEL_PID(error):  #//M0速度环
+    return vel_loop_M1(error)
+
+#//M0角度PID接口
+def DFOC_M1_ANGLE_PID(error):
+    return angle_loop_M1(error)
 
 # 工具函数
 def _constrain(amt, low, high):
@@ -262,10 +324,10 @@ def DFOC_M1_setTorque(target):
     M1_setTorque(Uq, S1_electricalAngle())
 
 def DFOC_M0_set_Velocity_Angle(Target):  #//角度-速度-力 位置闭环
-    DFOC_M0_setTorque(DFOC_M0_VEL_PID(DFOC_M0_ANGLE_PID((Target - DFOC_M0_Angle()) * 180 / PI) - DFOC_M0_Velocity()))  #//改进后
+    DFOC_M0_setTorque(DFOC_M0_VEL_PID(DFOC_M0_ANGLE_PID((Target - DFOC_M0_Angle()) * 180 / _PI) - DFOC_M0_Velocity()))  #//改进后
 
 def DFOC_M1_set_Velocity_Angle(Target):  #//角度-速度-力 位置闭环
-    DFOC_M1_setTorque(DFOC_M1_VEL_PID(DFOC_M1_ANGLE_PID((Target - DFOC_M1_Angle()) * 180 / PI) - DFOC_M1_Velocity()))  #//改进后
+    DFOC_M1_setTorque(DFOC_M1_VEL_PID(DFOC_M1_ANGLE_PID((Target - DFOC_M1_Angle()) * 180 / _PI) - DFOC_M1_Velocity()))  #//改进后
 
 
 # 速度环控制
@@ -280,10 +342,10 @@ def DFOC_M1_setVelocity(target):
     DFOC_M1_setTorque(torque_target)
     
 def DFOC_M0_set_Force_Angle(Target):  #//力位闭环
-    DFOC_M0_setTorque(DFOC_M0_ANGLE_PID((Target - DFOC_M0_Angle()) * 180 / PI))  #//改进后
+    DFOC_M0_setTorque(DFOC_M0_ANGLE_PID((Target - DFOC_M0_Angle()) * 180 / _PI))  #//改进后
 
 def DFOC_M1_set_Force_Angle(Target):  #//力位闭环
-    DFOC_M1_setTorque(DFOC_M1_ANGLE_PID((Target - DFOC_M1_Angle()) * 180 / PI))  #//改进后
+    DFOC_M1_setTorque(DFOC_M1_ANGLE_PID((Target - DFOC_M1_Angle()) * 180 / _PI))  #//改进后
 
 # FOC主循环
 def runFOC():
