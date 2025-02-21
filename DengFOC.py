@@ -142,8 +142,12 @@ def DFOC_M1_ANGLE_PID(error):
 
 # 工具函数
 def _constrain(amt, low, high):
-    return max(min(amt, high), low)
-
+    if amt < low:
+        return low
+    elif amt > high:
+        return high
+    return amt
+    
 def _normalizeAngle(angle):
     a = math.fmod(angle, _2PI)
     return a if a >= 0 else a + _2PI
