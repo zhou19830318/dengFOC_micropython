@@ -187,7 +187,7 @@ def M0_setTorque(Uq, angle_el):
     Uq = abs(Uq)
     
     angle_el = _normalizeAngle(angle_el + _PI_2)
-    sector = int(math.floor(angle_el / _PI_3)) + 1
+    sector = math.floor(angle_el / _PI_3) + 1
     
     T1 = _SQRT3 * math.sin(sector * _PI_3 - angle_el) * Uq / voltage_power_supply
     T2 = _SQRT3 * math.sin(angle_el - (sector-1.0)*_PI_3) * Uq / voltage_power_supply
@@ -216,7 +216,7 @@ def M1_setTorque(Uq, angle_el):
     Uq = abs(Uq)
     
     angle_el = _normalizeAngle(angle_el + _PI_2)
-    sector = int(math.floor(angle_el / _PI_3)) + 1
+    sector = math.floor(angle_el / _PI_3) + 1
     
     T1 = _SQRT3 * math.sin(sector * _PI_3 - angle_el) * Uq / voltage_power_supply
     T2 = _SQRT3 * math.sin(angle_el - (sector-1.0)*_PI_3) * Uq / voltage_power_supply
@@ -245,7 +245,7 @@ def DFOC_enable():
 
 def DFOC_disable():
     enable0_pin.value(0)
-    enable1_pin.value(1)
+    enable1_pin.value(0)
 
 def DFOC_Vbus(power_supply):
     global voltage_power_supply
@@ -256,6 +256,7 @@ def DFOC_Vbus(power_supply):
     # 初始化编码器
     S0.Sensor_init(0, 18, 19)
     S1.Sensor_init(1, 5, 23)
+    vel_loop_M0 = PIDController(2, 0, 0, 100000, voltage_power_supply / 2 )
     print("System initialization completed")
 
 def S0_electricalAngle():
@@ -301,48 +302,52 @@ def cal_Iq_Id(current_a, current_b, angle_el):
     return I_beta * ct - I_alpha * st  # I_q
 
 def DFOC_M0_Current():
-    I_q = cal_Iq_Id(CS_M0.current_a, CS_M0.current_b, S0_electricalAngle())
-    return M0_Curr_Flt(I_q)
+    I_q_M0_ori = cal_Iq_Id(CS_M0.current_a, CS_M0.current_b, S0_electricalAngle())
+    return M0_Curr_Flt(I_q_M0_ori)
 
 def DFOC_M1_Current():
-    I_q = cal_Iq_Id(CS_M1.current_a, CS_M1.current_b, S1_electricalAngle())
-    return M1_Curr_Flt(I_q)
-
+    I_q_M1_ori = cal_Iq_Id(CS_M1.current_a, CS_M1.current_b, S1_electricalAngle())
+    return M1_Curr_Flt(I_q_M1_ori)
+#=========================电流读取=========================
+#有滤波
 def DFOC_M0_Velocity():
-    vel = M0_DIR * S0.getVelocity()
-    return M0_Vel_Flt(vel)
+    vel_M0_ori = M0_DIR * S0.getVelocity()
+    return M0_Vel_Flt(vel_M0_ori) #考虑方向
 
 def DFOC_M1_Velocity():
-    vel = M1_DIR * S1.getVelocity()
-    return M1_Vel_Flt(vel)
+    vel_M1_ori = M1_DIR * S1.getVelocity()
+    return M1_Vel_Flt(vel_M1_ori) #考虑方向
 
-# 电流环控制
+# 电流力矩环
 def DFOC_M0_setTorque(target):
     current_error = target - DFOC_M0_Current()
     Uq = current_loop_M0(current_error)
     M0_setTorque(Uq, S0_electricalAngle())
-
+    
+# 电流力矩环
 def DFOC_M1_setTorque(target):
     current_error = target - DFOC_M1_Current()
     Uq = current_loop_M1(current_error)
     M1_setTorque(Uq, S1_electricalAngle())
 
 def DFOC_M0_set_Velocity_Angle(Target):  #//角度-速度-力 位置闭环
+    # DFOC_M0_setTorque(DFOC_M0_VEL_PID(DFOC_M0_ANGLE_PID((Target-DFOC_M0_Angle())*180/PI)),_electricalAngle()) #//改进前
     DFOC_M0_setTorque(DFOC_M0_VEL_PID(DFOC_M0_ANGLE_PID((Target - DFOC_M0_Angle()) * 180 / _PI) - DFOC_M0_Velocity()))  #//改进后
 
 def DFOC_M1_set_Velocity_Angle(Target):  #//角度-速度-力 位置闭环
+    # DFOC_M1_setTorque(DFOC_M1_VEL_PID(DFOC_M1_ANGLE_PID((Target-DFOC_M1_Angle())*180/PI)),_electricalAngle()) #//改进前
     DFOC_M1_setTorque(DFOC_M1_VEL_PID(DFOC_M1_ANGLE_PID((Target - DFOC_M1_Angle()) * 180 / _PI) - DFOC_M1_Velocity()))  #//改进后
 
 
-# 速度环控制
+# 速度闭环
 def DFOC_M0_setVelocity(target):
     velocity_error = (target - DFOC_M0_Velocity()) * 180 / _PI
-    torque_target = vel_loop_M0(velocity_error)
+    torque_target = DFOC_M0_VEL_PID(velocity_error)
     DFOC_M0_setTorque(torque_target)
 
 def DFOC_M1_setVelocity(target):
     velocity_error = (target - DFOC_M1_Velocity()) * 180 / _PI
-    torque_target = vel_loop_M1(velocity_error)
+    torque_target = DFOC_M1_VEL_PID(velocity_error)
     DFOC_M1_setTorque(torque_target)
     
 def DFOC_M0_set_Force_Angle(Target):  #//力位闭环
