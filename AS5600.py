@@ -80,7 +80,7 @@ class Sensor_AS5600:
 # 示例用法
 if __name__ == "__main__":
     sensor = Sensor_AS5600(1)  # Mot_Num = 1
-    sensor.Sensor_init(18, 19)  # 示例引脚，根据硬件调整 scl_pin, sda_pin
+    sensor.Sensor_init(0, 18, 19)  # 示例引脚，根据硬件调整 scl_pin, sda_pin
     while True:
         sensor.Sensor_update()
         print("Angle:", sensor.getAngle())
