@@ -158,26 +158,26 @@ def M0_setPwm(Ua, Ub, Uc):
     Ub = _constrain(Ub, 0.0, voltage_power_supply)
     Uc = _constrain(Uc, 0.0, voltage_power_supply)
     
-    dc_a = int(_constrain(Ua / voltage_power_supply, 0.0, 1.0) * 1023)
-    dc_b = int(_constrain(Ub / voltage_power_supply, 0.0, 1.0) * 1023)
-    dc_c = int(_constrain(Uc / voltage_power_supply, 0.0, 1.0) * 1023)
+    dc_a = int(_constrain(Ua / voltage_power_supply, 0.0, 1.0) * 65535)
+    dc_b = int(_constrain(Ub / voltage_power_supply, 0.0, 1.0) * 65535)
+    dc_c = int(_constrain(Uc / voltage_power_supply, 0.0, 1.0) * 65535)
     
-    pwm_channels['M0']['A'].duty(dc_a)
-    pwm_channels['M0']['B'].duty(dc_b)
-    pwm_channels['M0']['C'].duty(dc_c)
+    pwm_channels['M0']['A'].duty_u16(dc_a)
+    pwm_channels['M0']['B'].duty_u16(dc_b)
+    pwm_channels['M0']['C'].duty_u16(dc_c)
 
 def M1_setPwm(Ua, Ub, Uc):
     Ua = _constrain(Ua, 0.0, voltage_power_supply)
     Ub = _constrain(Ub, 0.0, voltage_power_supply)
     Uc = _constrain(Uc, 0.0, voltage_power_supply)
     
-    dc_a = int(_constrain(Ua / voltage_power_supply, 0.0, 1.0) * 1023)
-    dc_b = int(_constrain(Ub / voltage_power_supply, 0.0, 1.0) * 1023)
-    dc_c = int(_constrain(Uc / voltage_power_supply, 0.0, 1.0) * 1023)
+    dc_a = int(_constrain(Ua / voltage_power_supply, 0.0, 1.0) * 65535)
+    dc_b = int(_constrain(Ub / voltage_power_supply, 0.0, 1.0) * 65535)
+    dc_c = int(_constrain(Uc / voltage_power_supply, 0.0, 1.0) * 65535)
     
-    pwm_channels['M1']['A'].duty(dc_a)
-    pwm_channels['M1']['B'].duty(dc_b)
-    pwm_channels['M1']['C'].duty(dc_c)
+    pwm_channels['M1']['A'].duty_u16(dc_a)
+    pwm_channels['M1']['B'].duty_u16(dc_b)
+    pwm_channels['M1']['C'].duty_u16(dc_c)
 
 # 扭矩设置函数
 def M0_setTorque(Uq, angle_el):
